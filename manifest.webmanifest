@@ -6,9 +6,10 @@
   "theme_color": "#111111",
   "icons": [
     {
-      "src": "./apple-touch-icon-zunda.png",
+      "src": "./apple-touch-icon-zunda.png?v=2",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
