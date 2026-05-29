@@ -1,10 +1,10 @@
 {
   "id": "opening_policy",
-  "default_mode": "zundamon_cold_opent",
+  "default_mode": "zundamon_cold_opening",
   "available_modes": {
     "gpt_default": {
       "display_name": "ずんだもんあるあるスタート",
-      "starter": "gpt",
+      "starter": "zundamon",
       "rules": [
         "最初の発言者はずんだもんに固定する",
         "ずんだもんはいきなり変なことを言ってよい",

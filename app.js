@@ -1366,10 +1366,10 @@ function formatOpeningPolicyMode(mode) {
 }
 
 function formatOpeningPolicyInstructions(mode) {
-  if (mode.id === "gpt_default") {
+  if (mode.id === "zundamon_cold_opening") {
     return [
-      "- opening_policy が gpt_default の場合、最初の発言者は必ず GPT",
-      "- GPT は議題に対して正論・合理性寄りの短い初期主張を置く",
+      "- opening_policy が zundamon_cold_opening の場合、最初の発言者は必ず ずんだもん",
+      "- 最初から軽くズレている状態で開始してよい",
       "- ただし議論を完結させず、他キャラが反論・茶化し・前提刺し・脱線しやすい余白を残す"
     ];
   }
