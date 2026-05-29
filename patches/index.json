@@ -15,7 +15,7 @@
     "id": "ten_no_koe_soft_to_zundamon_event",
     "label": "天の声ソフトからずんだもんイベント",
     "type": "event_patch",
-    "file": "ten_no_koe_soft_to_zundamon_event.json"
+    "file": "ten_no_koe_soft_to_zundamon_evGent.json"
   },
   {
     "id": "hatoyome_guest",
