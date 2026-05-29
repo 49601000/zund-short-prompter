@@ -14,7 +14,7 @@ const STORAGE_KEYS = {
 const PERSONA_IDS = ["zundamon", "metan", "ten_no_koe"];
 const DEFAULT_STYLE_ID = "zundamon_short_dialogue";
 const DEFAULT_OPENING_MODE = "zundamon_cold_open";
-const DEFAULT_LENGTH_PRESET = "short";
+const DEFAULT_LENGTH_PRESET = "very_short";
 const SPLASH_VISIBLE_MS = 1800;
 let appHasInitialized = false;
 let splashHasInitialized = false;
@@ -134,6 +134,26 @@ const BUILTIN_FALLBACK_LENGTH_POLICY = {
   id: "length_policy",
   default_preset: DEFAULT_LENGTH_PRESET,
   presets: {
+    very_short: {
+      display_name: "超短め 450〜650",
+      mode: "target_range",
+      priority: "tempo_first",
+      target_total_chars: {
+        min: 450,
+        max: 650,
+        unit: "japanese_characters"
+      },
+      utterance_count: {
+        min: 5,
+        max: 7
+      },
+      per_utterance_chars: {
+        default_min: 35,
+        default_target: 65,
+        default_max: 95,
+        frenzy_max: 130
+      }
+    },
     short: {
       display_name: "短め 1000〜1300",
       mode: "target_range",

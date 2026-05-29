@@ -1,99 +1,110 @@
 {
   "id": "length_policy",
-  "default_preset": "standard",
+  "default_preset": "very_short",
   "presets": {
     "very_short": {
-      "display_name": "超短め 800〜1000",
+      "display_name": "超短め 450〜650",
       "mode": "target_range",
+      "priority": "tempo_first",
       "target_total_chars": {
-        "min": 800,
-        "max": 1000,
-        "unit": "japanese_characters"
+        "min": 450,
+        "max": 650,
+        "unit": "japanese_characters",
+        "hardness": "balanced"
       },
       "utterance_count": {
-        "min": 6,
-        "max": 8
+        "min": 5,
+        "max": 7
       },
       "per_utterance_chars": {
-        "default_min": 45,
-        "default_target": 80,
-        "default_max": 120,
-        "frenzy_max": 160
+        "default_min": 35,
+        "default_target": 65,
+        "default_max": 95,
+        "frenzy_max": 130
       }
     },
-   "short": {
-      "display_name": "短め 1000〜1300",
+    "short": {
+      "display_name": "短め 650〜900",
       "mode": "target_range",
+      "priority": "tempo_first",
       "target_total_chars": {
-        "min": 1000,
-        "max": 1300,
-        "unit": "japanese_characters"
+        "min": 650,
+        "max": 900,
+        "unit": "japanese_characters",
+        "hardness": "balanced"
+      },
+      "utterance_count": {
+        "min": 7,
+        "max": 10
+      },
+      "per_utterance_chars": {
+        "default_min": 35,
+        "default_target": 70,
+        "default_max": 105,
+        "frenzy_max": 150
+      }
+    },
+    "standard": {
+      "display_name": "標準 900〜1200",
+      "mode": "target_range",
+      "priority": "tempo_first",
+      "target_total_chars": {
+        "min": 900,
+        "max": 1200,
+        "unit": "japanese_characters",
+        "hardness": "balanced"
       },
       "utterance_count": {
         "min": 10,
         "max": 14
       },
       "per_utterance_chars": {
-        "default_min": 50,
-        "default_max": 140,
-        "frenzy_max": 280
-      }
-    },
-    "standard": {
-      "display_name": "標準 1400〜1600",
-      "priority": "total_chars_first",
-      "mode": "target_range",
-      "target_total_chars": {
-        "min": 1400,
-        "max": 1600,
-        "unit": "japanese_characters",
-        "hardness": "strong"
-      },
-      "utterance_count": {
-        "min": 10,
-        "max": 13
-      },
-      "per_utterance_chars": {
-        "default_min": 60,
-        "default_target": 90,
-        "default_max": 120,
-        "frenzy_max": 220
+        "default_min": 40,
+        "default_target": 75,
+        "default_max": 110,
+        "frenzy_max": 170
       }
     },
     "long": {
-      "display_name": "長め 1800〜2200",
+      "display_name": "長め 1200〜1600",
       "mode": "target_range",
+      "priority": "tempo_first",
       "target_total_chars": {
-        "min": 1800,
-        "max": 2200,
-        "unit": "japanese_characters"
+        "min": 1200,
+        "max": 1600,
+        "unit": "japanese_characters",
+        "hardness": "balanced"
       },
       "utterance_count": {
-        "min": 16,
-        "max": 24
+        "min": 14,
+        "max": 20
       },
       "per_utterance_chars": {
-        "default_min": 60,
-        "default_max": 150,
-        "frenzy_max": 320
+        "default_min": 40,
+        "default_target": 80,
+        "default_max": 120,
+        "frenzy_max": 200
       }
     },
     "custom": {
       "display_name": "カスタム min/max",
       "mode": "target_range",
+      "priority": "tempo_first",
       "target_total_chars": {
-        "min": 1400,
-        "max": 1600,
-        "unit": "japanese_characters"
+        "min": 650,
+        "max": 900,
+        "unit": "japanese_characters",
+        "hardness": "balanced"
       },
       "utterance_count": {
-        "min": 12,
-        "max": 20
+        "min": 7,
+        "max": 12
       },
       "per_utterance_chars": {
-        "default_min": 60,
-        "default_max": 150,
-        "frenzy_max": 300
+        "default_min": 35,
+        "default_target": 70,
+        "default_max": 110,
+        "frenzy_max": 180
       },
       "custom_allowed": true
     }
@@ -103,11 +114,12 @@
     "説明より反応を優先する",
     "1発言1メッセージを徹底する",
     "1発言は短く、一瞬で読める長さにする",
-    "1発言は3〜20文字程度を基本とする",
     "長文説明は禁止",
     "短文ラリーで会話を回す",
     "ツッコミと反応の往復を重視する",
-    "会話が止まったら論点ずらしで動かす",
+    "めたんの解説は最小限にする",
+    "天の声の比喩で理解を圧縮してよい",
+    "会話が止まったら長文化ではなく短い反応で動かす",
     "理解よりテンポを優先してよい",
     "多少雑でも勢いを優先する",
     "字幕を見た瞬間に意味が通る表現を使う",
@@ -115,8 +127,10 @@
     "最後は雑に流して終わってよい"
   ],
   "fallback": [
-    "レンジ下限を下回りそうなら発言回数を増やす",
-    "レンジ上限を超えそうなら各発言を短くする",
-    "長文化ではなくターン数で調整する"
+    "レンジ下限を下回りそうなら短い発言を1〜2個だけ増やす",
+    "レンジ上限を超えそうなら説明発言を削る",
+    "長文化ではなくターン数で調整する",
+    "天の声が入る場合は、めたんの追加解説を減らす",
+    "社会論・人類論へ広げず、日常あるあるへ戻す"
   ]
 }
