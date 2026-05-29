@@ -7,7 +7,7 @@
   "icons": [
     {
       "src": "./apple-touch-icon-zunda.png",
-      "sizes": "512x512",
+      "sizes": "180x180",
       "type": "image/png"
     }
   ]
