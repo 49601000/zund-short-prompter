@@ -878,8 +878,7 @@ function saveEnabledPatchIds() {
 function onRollDice() {
   clearError();
 
-  //const dice = Math.floor(Math.random() * 20) + 1;
-  const dice = 5
+  const dice = Math.floor(Math.random() * 20) + 1;
   const selectedRuleId = mapDiceToRuleId(dice);
 
   state.diceResult = dice;
@@ -893,19 +892,7 @@ function onRollDice() {
 }
 
 function mapDiceToRuleId(dice) {
-  if (dice <= 5) {
-    return "state_rule1";
-  }
-  if (dice <= 7) {
-    return "state_rule2";
-  }
-  if (dice === 8) {
-    return "state_rule3";
-  }
-  if (dice <= 14) {
-    return "state_rule4";
-  }
-  return "state_rule5";
+  return "state_rule";
 }
 
 async function onGeneratePrompt() {
@@ -954,6 +941,7 @@ async function onGeneratePrompt() {
 
     const openingPolicyMode = getSelectedOpeningMode(personas, guestCharacters);
     const lengthPolicyMode = getSelectedLengthPolicyMode(rule);
+    const conversationArcVariant = resolveConversationArcVariant(style, state.diceResult);
 
     const assembledPrompt = assemblePrompt({
       debateEngine,
@@ -961,6 +949,7 @@ async function onGeneratePrompt() {
       personas,
       rule,
       style,
+      conversationArcVariant,
       openingPolicyMode,
       lengthPolicyMode,
       patchPayloads,
@@ -997,7 +986,14 @@ async function fetchRule(ruleId) {
 
 function fallbackRuleFor(ruleId) {
   if (ruleId === "state_rule") {
-    return "state_rule1";
+    return "state_rule";
+  }
+  if (ruleId === "state_rule1"
+    || ruleId === "state_rule2"
+    || ruleId === "state_rule3"
+    || ruleId === "state_rule4"
+    || ruleId === "state_rule5") {
+    return "state_rule";
   }
   return ruleId;
 }
@@ -1152,6 +1148,64 @@ function normalizeStyle(rawStyle, fallbackId) {
   };
 }
 
+function resolveConversationArcVariant(style, diceValue) {
+  const renderer = style?.style_renderer;
+  const roll = renderer?.conversation_arc_roll;
+  const variants = renderer?.conversation_arc_variants;
+  if (!roll?.enabled || !variants || typeof variants !== "object") {
+    return null;
+  }
+
+  const desireCurve = Array.isArray(roll.axis?.desire_curve)
+    ? roll.axis.desire_curve.filter((entry) =>
+      entry
+      && typeof entry.id === "string"
+      && entry.id.trim().length > 0
+    )
+    : [];
+  const endingTurn = Array.isArray(roll.axis?.ending_turn)
+    ? roll.axis.ending_turn.filter((entry) =>
+      entry
+      && typeof entry.id === "string"
+      && entry.id.trim().length > 0
+    )
+    : [];
+  if (desireCurve.length === 0 || endingTurn.length === 0) {
+    return null;
+  }
+
+  const rolledDice = Number.isFinite(diceValue) && diceValue > 0
+    ? Math.trunc(diceValue)
+    : Math.floor(Math.random() * 20) + 1;
+  const desire = desireCurve[(rolledDice - 1) % desireCurve.length];
+  const ending = endingTurn[Math.floor((rolledDice - 1) / desireCurve.length) % endingTurn.length];
+  const preferredVariantId = `${desire.id}__${ending.id}`;
+
+  const preferredVariant = variants[preferredVariantId];
+  if (preferredVariant && typeof preferredVariant === "object") {
+    return normalizeConversationArcVariant(preferredVariant, preferredVariantId, desire, ending, rolledDice);
+  }
+
+  const firstVariantId = Object.keys(variants)[0];
+  if (!firstVariantId) {
+    return null;
+  }
+  return normalizeConversationArcVariant(variants[firstVariantId], firstVariantId, desire, ending, rolledDice);
+}
+
+function normalizeConversationArcVariant(rawVariant, variantId, desire, ending, rolledDice) {
+  const rules = sanitizeStringList(rawVariant?.rules, 10, []);
+  return {
+    variant_id: variantId,
+    dice_result: rolledDice,
+    desire_curve_id: desire.id,
+    desire_curve_description: typeof desire.description === "string" ? desire.description : "",
+    ending_turn_id: ending.id,
+    ending_turn_description: typeof ending.description === "string" ? ending.description : "",
+    rules
+  };
+}
+
 function getSelectedOpeningMode(personas, guestCharacters) {
   const policy = state.openingPolicy || BUILTIN_FALLBACK_OPENING_POLICY;
   const modeId = normalizeOpeningModeId(state.selectedOpeningMode);
@@ -1216,6 +1270,7 @@ function assemblePrompt(payload) {
     personas,
     rule,
     style,
+    conversationArcVariant,
     openingPolicyMode,
     lengthPolicyMode,
     patchPayloads,
@@ -1239,6 +1294,9 @@ function assemblePrompt(payload) {
     "# Layer 4: Style Renderer",
     formatStyle(style),
     "",
+    "# Layer 4.5: Conversation Arc Variant",
+    formatConversationArcVariant(conversationArcVariant),
+    "",
     "# Layer 5: Opening Policy",
     formatOpeningPolicyMode(openingPolicyMode),
     "",
@@ -1250,6 +1308,7 @@ function assemblePrompt(payload) {
     `ダイスロール結果: ${state.diceResult}`,
     `適用ルール: ${state.selectedRuleId}`,
     `選択スタイル: ${style.id}`,
+    `会話演出バリアント: ${conversationArcVariant ? conversationArcVariant.variant_id : "none"}`,
     `開幕モード: ${openingPolicyMode.id}`,
     `最初の発言者: ${openingPolicyMode.id === "zundamon_cold_opening" ? "ずんだもん" : "完全ランダム"}`,
     ...(openingPolicyMode.id === "fully_random"
@@ -1272,8 +1331,10 @@ function assemblePrompt(payload) {
     "- ライブ感とテンポを優先する",
     "- 最後はずんだもんが雑に壊して終わってよい",
     "- 総括や綺麗なオチは禁止",
+    "- ending_rules.allowed は許可候補として扱い、毎回固定で実行しない",
     "- style_renderer は語尾だけでなく、会話テンポ、割り込み、長文例外、特殊イベント、用語辞書、終幕処理まで制御する",
     "- style_renderer / rule の examples / candidates は候補扱いとし、並列連結でそのまま出力しない",
+    ...formatConversationArcInstructions(conversationArcVariant),
     ...formatOpeningPolicyInstructions(openingPolicyMode),
     ...formatLengthPolicyInstructions(lengthPolicyMode),
     "",
@@ -1370,6 +1431,36 @@ function formatStyle(style) {
     "style_renderer:",
     JSON.stringify(style.style_renderer, null, 2)
   ].join("\n");
+}
+
+function formatConversationArcVariant(variant) {
+  if (!variant) {
+    return "なし (style_renderer.conversation_arc_roll が未設定または無効)";
+  }
+
+  return [
+    `variant_id: ${variant.variant_id}`,
+    `dice_result: ${variant.dice_result}`,
+    `desire_curve: ${variant.desire_curve_id}`,
+    `desire_curve_description: ${variant.desire_curve_description}`,
+    `ending_turn: ${variant.ending_turn_id}`,
+    `ending_turn_description: ${variant.ending_turn_description}`,
+    "rules:",
+    ...(variant.rules.length > 0 ? variant.rules.map((rule) => `- ${rule}`) : ["- なし"])
+  ].join("\n");
+}
+
+function formatConversationArcInstructions(variant) {
+  if (!variant) {
+    return [];
+  }
+
+  return [
+    `- conversation_arc_variants から ${variant.variant_id} を演出ガイドとして適用する`,
+    ...variant.rules.map((rule) => `- ${rule}`),
+    "- 上記ルールは演出の方向づけとして扱い、議題破綻や同一オチ固定は避ける",
+    "- 金銭要求・奢り要求は『可能な終わり方の一つ』として扱い、毎回必須にしない"
+  ];
 }
 
 function formatOpeningPolicyMode(mode) {

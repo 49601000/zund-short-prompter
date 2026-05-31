@@ -171,6 +171,122 @@
       ]
     },
 
+    "conversation_arc_roll": {
+      "enabled": true,
+      "axis": {
+        "desire_curve": [
+          {
+            "id": "gradual_soft",
+            "description": "欲望や本音を徐々に出し、最後はややズレた空気で軽く終える",
+            "rules": [
+              "序盤は議題への反応を優先する",
+              "中盤からずんだもんの欲望・怠惰・承認欲求を少しずつ漏らす",
+              "終盤でめたんへ雑な要求をしてよい",
+              "カオス化しすぎず、軽いズレで終える"
+            ]
+          },
+          {
+            "id": "gradual_chaos",
+            "description": "欲望や本音を徐々に出し、終盤で強めに壊す",
+            "rules": [
+              "序盤は議題への反応を優先する",
+              "中盤からずんだもんの自己正当化を強める",
+              "終盤で欲望・怠惰・承認欲求を大きく出してよい",
+              "最後は少しカオスに壊してよい"
+            ]
+          },
+          {
+            "id": "full_throttle",
+            "description": "最初から欲望・極論・自己正当化を強く出す",
+            "rules": [
+              "1発言目からずんだもんが強めに暴走してよい",
+              "めたんが即ツッコミできる導入にする",
+              "欲望・極論・自己正当化を序盤から出してよい",
+              "最後まで勢いを落とさない"
+            ]
+          }
+        ],
+        "ending_turn": [
+          {
+            "id": "metan_last",
+            "description": "最後をめたんの短いツッコミ・拒否・呆れで終える",
+            "rules": [
+              "最後の発言者はめたんでもよい",
+              "めたんは短く拒否・ツッコミ・呆れで終えてよい",
+              "綺麗に総括しない"
+            ]
+          },
+          {
+            "id": "zundamon_last",
+            "description": "最後をずんだもんの雑な欲望・要求・自己正当化で終える",
+            "rules": [
+              "最後の発言者はずんだもんでもよい",
+              "ずんだもんが最後にめたんへ雑な要求をしてよい",
+              "ずんだもんが最後に欲望・怠惰・承認欲求を雑に残してよい",
+              "綺麗に総括しない"
+            ]
+          }
+        ]
+      }
+    },
+
+    "conversation_arc_variants": {
+      "gradual_soft__metan_last": {
+        "desire_curve": "gradual_soft",
+        "ending_turn": "metan_last",
+        "rules": [
+          "欲望を徐々に出す",
+          "最後はめたんの短いツッコミ・拒否・呆れで終えてよい",
+          "カオス化しすぎず、軽いズレで終える"
+        ]
+      },
+      "gradual_soft__zundamon_last": {
+        "desire_curve": "gradual_soft",
+        "ending_turn": "zundamon_last",
+        "rules": [
+          "欲望を徐々に出す",
+          "最後はずんだもんの雑な欲望・要求・自己正当化で終えてよい",
+          "軽いズレを残して終える"
+        ]
+      },
+      "gradual_chaos__metan_last": {
+        "desire_curve": "gradual_chaos",
+        "ending_turn": "metan_last",
+        "rules": [
+          "中盤から自己正当化を強める",
+          "終盤で欲望・怠惰・承認欲求を大きく出してよい",
+          "最後はめたんの短いツッコミ・拒否・呆れで締めてもよい"
+        ]
+      },
+      "gradual_chaos__zundamon_last": {
+        "desire_curve": "gradual_chaos",
+        "ending_turn": "zundamon_last",
+        "rules": [
+          "中盤から自己正当化を強める",
+          "終盤でややカオスに壊してよい",
+          "最後はずんだもんが雑な欲望を残して終えてよい"
+        ]
+      },
+      "full_throttle__metan_last": {
+        "desire_curve": "full_throttle",
+        "ending_turn": "metan_last",
+        "rules": [
+          "最初から欲望・極論・自己正当化を強めに出す",
+          "めたんが即ツッコミできる導入にする",
+          "最後はめたんの短い拒否・呆れで切ってよい"
+        ]
+      },
+      "full_throttle__zundamon_last": {
+        "desire_curve": "full_throttle",
+        "ending_turn": "zundamon_last",
+        "rules": [
+          "最初から欲望・極論・自己正当化を強めに出す",
+          "勢いを維持したまま最後まで落とさない",
+          "最後はずんだもんの雑な欲望・要求で終えてよい"
+        ]
+      }
+    },
+
     "quality_check": [
       "短文テンポになっているか",
       "ずんだもんが空気を動かしているか",
